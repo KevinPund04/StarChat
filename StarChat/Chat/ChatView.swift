@@ -1,33 +1,46 @@
 import SwiftUI
 
 struct ChatView: View {
-	let chat: Chat
-	@StateObject private var viewModel = ChatViewModel()
-	@State private var userInput = ""
-
+	@ObservedObject var viewModel = ChatViewModel()
+	@State private var userInput: String = ""
+	var chat: Chat
+	
 	var body: some View {
 		VStack {
 			ScrollView {
-				ForEach(viewModel.messages) { message in
-					HStack {
-						if message.isUser { Spacer() }
-						Text(message.text)
-							.padding()
-							.background(message.isUser ? Color.blue : Color.gray.opacity(0.2))
-							.cornerRadius(10)
-						if !message.isUser { Spacer() }
+				VStack(alignment: .leading, spacing: 8) {
+					ForEach(chat.messages) { message in
+						HStack {
+							if message.isUser {
+								Spacer()
+								Text(message.text)
+									.padding()
+									.background(Color.blue.opacity(0.8))
+									.foregroundColor(.white)
+									.cornerRadius(10)
+							} else {
+								Text(message.text)
+									.padding()
+									.background(Color.gray.opacity(0.2))
+									.cornerRadius(10)
+								Spacer()
+							}
+						}
 					}
-					.padding(.horizontal)
 				}
+				.padding()
 			}
+			.frame(maxHeight: .infinity)
 			
 			HStack {
 				TextField("Nachricht eingeben...", text: $userInput)
 					.textFieldStyle(RoundedBorderTextFieldStyle())
 				Button("Senden") {
-					viewModel.sendMessage(userInput, for: chat)
+					guard !userInput.trimmingCharacters(in: .whitespaces).isEmpty else { return }
+					viewModel.sendMessage(viewModel.newMessage, for: chat)
 					userInput = ""
 				}
+				.padding(.horizontal)
 			}
 			.padding()
 		}
