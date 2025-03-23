@@ -10,15 +10,23 @@ class ChatViewModel: ObservableObject {
 	@Published var messages: [Message] = []
 	private let apiKey = "AIzaSyAKkPfT8MXfV3e7X0E5qDox1PGKdZqsT5I"
 
-	func sendMessage(_ userMessage: String) {
+	func sendMessage(_ userMessage: String, for chat: Chat) {
 		let endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=\(apiKey)"
 		
-		var chatHistory: [[String: Any]] = messages.map { message in
+		var chatHistory: [[String: Any]] = []
+		
+		let systemPrompt = "Du bist \(chat.name). \(chat.persona)"
+		chatHistory.append([
+			"role": "model",
+			"parts": [["text": systemPrompt]]
+		])
+		
+		chatHistory.append(contentsOf: messages.map { message in
 			[
-				"role": message.isUser ? "user" : "model",
-				"parts": [["text": message.text]]
+			"role": message.isUser ? "user" : "model",
+			"parts": [["text": message.text]]
 			]
-		}
+		})
 		
 		chatHistory.append([
 			"role": "user",
