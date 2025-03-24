@@ -1,6 +1,12 @@
 import SwiftUI
 
 class ChatViewModel: ObservableObject {
+	
+	let cornerRadius = 10
+	let textMaxWidth = 250
+	let backgroundColorOpacity = 0.7
+	let lazyVStackspacing = 8
+	
 	@Published var chat: Chat
 	@Published var newMessage: String = ""
 	

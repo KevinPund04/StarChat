@@ -7,24 +7,24 @@ struct ChatView: View {
 	var body: some View {
 		VStack {
 			ScrollView {
-				LazyVStack(alignment: .leading, spacing: 8) {
+				LazyVStack(alignment: .leading, spacing: viewModel.lazyVStackspacing) {
 					ForEach(viewModel.chat.messages) { message in
 						HStack {
 							if message.isUser {
 								Spacer()
 								Text(message.text)
 									.padding()
-									.background(Color.blue.opacity(0.7))
+									.background(Color.blue.opacity(viewModel.backgroundColorOpacity))
 									.foregroundColor(.white)
-									.cornerRadius(10)
-									.frame(maxWidth: 250, alignment: .trailing)
+									.cornerRadius(viewModel.cornerRadius)
+									.frame(maxWidth: viewModel.textMaxWidth, alignment: .trailing)
 							} else {
 								Text(message.text)
 									.padding()
-									.background(Color.white.opacity(0.7))
+									.background(Color.white.opacity(viewModel.backgroundColorOpacity))
 									.foregroundColor(.black)
-									.cornerRadius(10)
-									.frame(maxWidth: 250, alignment: .leading)
+									.cornerRadius(viewModel.cornerRadius)
+									.frame(maxWidth: viewModel.textMaxWidth, alignment: .leading)
 								Spacer()
 							}
 						}
