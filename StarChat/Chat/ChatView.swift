@@ -1,28 +1,30 @@
 import SwiftUI
 
 struct ChatView: View {
-	@ObservedObject var viewModel = ChatViewModel()
-	@State private var userInput: String = ""
+	@StateObject var viewModel: ChatViewModel
 	var chat: Chat
-	
+
 	var body: some View {
 		VStack {
 			ScrollView {
-				VStack(alignment: .leading, spacing: 8) {
-					ForEach(chat.messages) { message in
+				LazyVStack(alignment: .leading, spacing: 8) {
+					ForEach(viewModel.chat.messages) { message in
 						HStack {
 							if message.isUser {
 								Spacer()
 								Text(message.text)
 									.padding()
-									.background(Color.blue.opacity(0.8))
+									.background(Color.blue.opacity(0.7))
 									.foregroundColor(.white)
 									.cornerRadius(10)
+									.frame(maxWidth: 250, alignment: .trailing)
 							} else {
 								Text(message.text)
 									.padding()
-									.background(Color.gray.opacity(0.2))
+									.background(Color.white.opacity(0.7))
+									.foregroundColor(.black)
 									.cornerRadius(10)
+									.frame(maxWidth: 250, alignment: .leading)
 								Spacer()
 							}
 						}
@@ -30,20 +32,25 @@ struct ChatView: View {
 				}
 				.padding()
 			}
-			.frame(maxHeight: .infinity)
-			
+
+			Divider()
+
 			HStack {
-				TextField("Nachricht eingeben...", text: $userInput)
+				TextField("Nachricht eingeben...", text: $viewModel.newMessage)
 					.textFieldStyle(RoundedBorderTextFieldStyle())
-				Button("Senden") {
-					guard !userInput.trimmingCharacters(in: .whitespaces).isEmpty else { return }
-					viewModel.sendMessage(viewModel.newMessage, for: chat)
-					userInput = ""
+					.padding()
+
+				Button(action: {
+					viewModel.sendMessage(viewModel.newMessage)
+					viewModel.newMessage = ""
+				}) {
+					Image(systemName: "paperplane.fill")
+						.foregroundColor(.blue)
+						.padding()
 				}
-				.padding(.horizontal)
 			}
-			.padding()
+			.padding(.horizontal)
 		}
-		.navigationTitle(chat.name)
+		.navigationTitle(viewModel.chat.name)
 	}
 }

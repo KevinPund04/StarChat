@@ -27,7 +27,7 @@ class ChatStorage {
 			let data = try JSONEncoder().encode(chat)
 			try data.write(to: fileURL)
 		} catch {
-			print("❌ Fehler beim Speichern des Chats: \(error.localizedDescription)")
+			print("Fehler beim Speichern des Chats: \(error.localizedDescription)")
 		}
 	}
 	
@@ -41,21 +41,42 @@ class ChatStorage {
 			let data = try Data(contentsOf: fileURL)
 			return try JSONDecoder().decode(Chat.self, from: data)
 		} catch {
-			print("❌ Fehler beim Laden des Chats: \(error.localizedDescription)")
+			print("Fehler beim Laden des Chats: \(error.localizedDescription)")
 			return nil
 		}
 	}
 	
 	func loadAllChats() -> [Chat] {
-		do {
-			let files = try fileManager.contentsOfDirectory(at: chatsDirectory, includingPropertiesForKeys: nil)
-			return files.compactMap { fileURL in
-				guard let data = try? Data(contentsOf: fileURL) else { return nil }
-				return try? JSONDecoder().decode(Chat.self, from: data)
-			}
-		} catch {
-			print("❌ Fehler beim Laden aller Chats: \(error.localizedDescription)")
+		var chats: [Chat] = []
+		
+		guard let resourcePath = Bundle.main.resourcePath else {
+			print("Konnte den Ressourcenpfad nicht finden.")
 			return []
 		}
+		
+		do {
+			let files = try FileManager.default.contentsOfDirectory(atPath: resourcePath)
+			
+			for file in files where file.hasSuffix(".json") {
+				let fileName = file.replacingOccurrences(of: ".json", with: "")
+				
+				if let fileURL = Bundle.main.url(forResource: fileName, withExtension: "json") {
+					do {
+						let data = try Data(contentsOf: fileURL)
+						let chat = try JSONDecoder().decode(Chat.self, from: data)
+						chats.append(chat)
+					}
+					catch {
+						print("Fehler beim Laden von \(file): \(error.localizedDescription)")
+					}
+				} else {
+					print("Datei \(file) konnte nicht im Bundle gefunden werden.")
+				}
+			}
+		} catch {
+			print("Fehler beim Durchsuchen des Resource-Ordners: \(error.localizedDescription)")
+		}
+		
+		return chats
 	}
 }

@@ -6,7 +6,8 @@ struct ChatListView: View {
 	var body: some View {
 		NavigationView {
 			List(viewModel.chats) { chat in
-				NavigationLink(destination: ChatView(chat: chat)) {
+				let chatViewModel = ChatViewModel(chat: chat)
+				NavigationLink(destination: ChatView(viewModel: chatViewModel, chat: chat)) {
 					Text(chat.name)
 				}
 			}
