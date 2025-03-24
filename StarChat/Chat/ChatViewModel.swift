@@ -1,14 +1,15 @@
 import SwiftUI
 
-class ChatViewModel: ObservableObject {
+class ChatViewModel: ObservableObject {			//ObservableObject: Ermöglicht, dass Änderungen im ViewModel die UI aktualisieren können
 	
-	let cornerRadius = 10
-	let textMaxWidth = 250
-	let backgroundColorOpacity = 0.7
-	let lazyVStackspacing = 8
+	let cornerRadius: CGFloat = 10
+	let textMaxWidth: CGFloat = 250
+	let backgroundColorOpacity: CGFloat = 0.7
+	let lazyVStackspacing: CGFloat = 8
 	
 	@Published var chat: Chat
 	@Published var newMessage: String = ""
+	//MARK: - @Published: Markiert eine Variable als beobachtbar. Änderungen lösen automatisch UI-Updates aus, sofern die Klasse ein ObservableObject ist.
 	
 	private let apiKey = "key"
 	
@@ -17,9 +18,9 @@ class ChatViewModel: ObservableObject {
 	}
 	
 	func sendMessage(_ userMessage: String) {
-		let endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=\(apiKey)"
-		
 
+		let geminiURL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=\(apiKey)"
+		
 		var chatHistory: [[String: Any]] = []
 		let systemPrompt = "Du bist \(chat.name). \(chat.persona)"
 		//MARK: - chatHistory enthält die gesamte Unterhaltung
@@ -55,7 +56,7 @@ class ChatViewModel: ObservableObject {
 		}
 		//MARK: - der requestBody (Dictionary) wird in JSON umgewandelt. Die API kann nur JSON-Dateien bearbeiten und keine Dictionarys oder Arrays von Swift.
 		
-		var request = URLRequest(url: URL(string: endpoint)!)
+		var request = URLRequest(url: URL(string: geminiURL)!)
 		request.httpMethod = "POST"													//POST wird verwendet um Daten zu senden
 		request.setValue("application/json", forHTTPHeaderField: "Content-Type")	//Sagt der API, das wir JSON-Daten schicken
 		request.httpBody = jsonData													//fügt den eigentlichen Inhalt (JSON-Daten) hinzu
