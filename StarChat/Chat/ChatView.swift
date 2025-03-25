@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct ChatView: View {
-	@StateObject var viewModel: ChatViewModel
+	@StateObject var viewModel: ChatViewModel					//@StateObject erstellt und verwaltet eine Instanz des ObservedObject
 	var chat: Chat
 
 	var body: some View {

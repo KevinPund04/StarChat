@@ -11,17 +11,21 @@ class ChatViewModel: ObservableObject {			//ObservableObject: Ermöglicht, dass 
 	@Published var newMessage: String = ""
 	//MARK: - @Published: Markiert eine Variable als beobachtbar. Änderungen lösen automatisch UI-Updates aus, sofern die Klasse ein ObservableObject ist.
 	
-	private let apiKey = "key"
+	private let apiKey = "MyKey"
+	var chatHistory: [[String: Any]] = []
+	
+	var geminiURL: String {
+		"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=\(apiKey)"		//Wert wird nicht gespeichert, sondern dynamisch berechnet.
+	}
 	
 	init(chat: Chat) {
 		self.chat = chat
 	}
 	
+	
 	func sendMessage(_ userMessage: String) {
-
-		let geminiURL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=\(apiKey)"
 		
-		var chatHistory: [[String: Any]] = []
+		
 		let systemPrompt = "Du bist \(chat.name). \(chat.persona)"
 		//MARK: - chatHistory enthält die gesamte Unterhaltung
 		
@@ -79,6 +83,7 @@ class ChatViewModel: ObservableObject {			//ObservableObject: Ermöglicht, dass 
 			if let jsonString = String(data: data, encoding: .utf8) {
 				print("📜 Antwort von API: \(jsonString)")
 			}
+			//MARK: - gibt die Antwort von der KI als String aus.
 			
 			do {
 				let decodedResponse = try JSONDecoder().decode(GeminiResponse.self, from: data)

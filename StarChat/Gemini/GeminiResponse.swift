@@ -4,9 +4,9 @@ struct GeminiResponse: Decodable {
 			struct Part: Decodable {
 				let text: String
 			}
-			let parts: [Part]
+			let parts: [Part]					//parts ist ein Array, da eine Antwort aus mehreren Teilen bestehen kann.
 		}
-		let content: Content
+		let content: Content					//content erhält die eigentliche Antwort von der API.
 	}
-	let candidates: [Candidate]
+	let candidates: [Candidate]					//liefert die möglichen Antworten von der API. Obwohl in der Regel nur eine Antwort zurück kommt, kann es später mal mehrer erhalten.
 }
