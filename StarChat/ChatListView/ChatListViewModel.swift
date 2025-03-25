@@ -2,9 +2,17 @@ import SwiftUI
 
 class ChatListViewModel: ObservableObject {
 	@Published var chats: [Chat] = []
+	@Published var searchChat: String = ""
 	
-	var sortedChats: [Chat] {
-		chats.sorted { $0.name < $1.name }
+	
+	var filteredChat: [Chat] {
+		if searchChat.isEmpty {
+			return chats.sorted { $0.name < $1.name }
+		} else {
+			return chats
+				.filter { $0.name.localizedCaseInsensitiveContains(searchChat) }
+				.sorted { $0.name < $1.name }
+		}
 	}
 	
 	init() {

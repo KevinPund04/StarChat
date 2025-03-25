@@ -11,7 +11,7 @@ class ChatViewModel: ObservableObject {			//ObservableObject: Ermöglicht, dass 
 	@Published var newMessage: String = ""
 	//MARK: - @Published: Markiert eine Variable als beobachtbar. Änderungen lösen automatisch UI-Updates aus, sofern die Klasse ein ObservableObject ist.
 	
-	private let apiKey = "MyKey"
+	private let apiKey = "key"
 	var chatHistory: [[String: Any]] = []
 	
 	var geminiURL: String {

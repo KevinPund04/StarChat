@@ -5,12 +5,13 @@ struct ChatListView: View {
 	
 	var body: some View {
 		NavigationView {
-			List(viewModel.sortedChats) { chat in
+			List(viewModel.filteredChat) { chat in
 				let chatViewModel = ChatViewModel(chat: chat)
 				NavigationLink(destination: ChatView(viewModel: chatViewModel, chat: chat)) {
 					Text(chat.name)
 				}
 			}
+			.searchable(text: $viewModel.searchChat, prompt: "Chat suchen")
 			.navigationTitle("Chats")
 		}
 	}
