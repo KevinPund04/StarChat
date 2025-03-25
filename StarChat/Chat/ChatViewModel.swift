@@ -11,11 +11,11 @@ class ChatViewModel: ObservableObject {			//ObservableObject: Ermöglicht, dass 
 	@Published var newMessage: String = ""
 	//MARK: - @Published: Markiert eine Variable als beobachtbar. Änderungen lösen automatisch UI-Updates aus, sofern die Klasse ein ObservableObject ist.
 	
-	private let apiKey = "key"
+	private let apiKey = "MyKey"
 	var chatHistory: [[String: Any]] = []
 	
 	var geminiURL: String {
-		"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=\(apiKey)"		//Wert wird nicht gespeichert, sondern dynamisch berechnet.
+		"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=\(apiKey)"		//Wert wird nicht gespeichert, sondern dynamisch 
 	}
 	
 	init(chat: Chat) {
@@ -66,6 +66,8 @@ class ChatViewModel: ObservableObject {			//ObservableObject: Ermöglicht, dass 
 		request.httpBody = jsonData													//fügt den eigentlichen Inhalt (JSON-Daten) hinzu
 		//MARK: - Ein URL-request wird erstellt um eine Netzwerkanfrage zu konfigurieren, bevor die abgeschickt wird.
 		
+		UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+		//MARK: - Wenn der user eine Nachricht abschickt, schließt sich die Tastatur automatisch.
 		
 		DispatchQueue.main.async {
 			let userMessageObj = Message(text: userMessage, isUser: true)
