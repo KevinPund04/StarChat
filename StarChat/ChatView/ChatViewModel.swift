@@ -15,6 +15,10 @@ class ChatViewModel: ObservableObject {			//ObservableObject: Ermöglicht, dass 
 		"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=\(apiKey)"		//Wert wird nicht gespeichert, sondern dynamisch 
 	}
 	
+	var emptyMessage: String {
+		newMessage.trimmingCharacters(in: .whitespacesAndNewlines)
+	}
+	
 	init(chat: Chat) {
 		self.chat = chat
 	}
@@ -23,14 +27,20 @@ class ChatViewModel: ObservableObject {			//ObservableObject: Ermöglicht, dass 
 	func sendMessage(_ userMessage: String) {
 		
 		
-		let systemPrompt = "Du bist \(chat.name). \(chat.persona)"
+		
 		//MARK: - chatHistory enthält die gesamte Unterhaltung
 		
+		let isFirstMessage = chat.messages.isEmpty
 		
-		chatHistory.append([
-			"role": "model",
-			"parts": [["text": systemPrompt]]
-		])
+		if isFirstMessage {
+			
+			let systemPrompt = "Du bist \(chat.name). \(chat.persona)"
+			
+			chatHistory.append([
+				"role": "model",
+				"parts": [["text": systemPrompt]]
+			])
+		}
 		//MARK: - Jede Nachricht wird als user oder model (KI) gespeichert. Im parts-array steht dann die dazugehörige Nachricht. systemPrompt sagt wie sich die KI verhalten soll.
 		
 		chatHistory.append(contentsOf: chat.messages.map { message in

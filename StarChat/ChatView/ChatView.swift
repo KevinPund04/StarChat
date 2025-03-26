@@ -3,7 +3,7 @@ import SwiftUI
 struct ChatView: View {
 	@StateObject var viewModel: ChatViewModel					//@StateObject erstellt und verwaltet eine Instanz des ObservedObject
 	var chat: Chat
-
+	
 	var body: some View {
 		VStack {
 			ScrollView {
@@ -23,8 +23,7 @@ struct ChatView: View {
 					.textFieldStyle(RoundedBorderTextFieldStyle())
 					.padding()
 				Button(action: {
-					let trimmedMessage = viewModel.newMessage.trimmingCharacters(in: .whitespacesAndNewlines)
-					if trimmedMessage.isEmpty { return }
+					if viewModel.emptyMessage.isEmpty { return }
 					
 					viewModel.sendMessage(viewModel.newMessage)
 					viewModel.newMessage = ""
