@@ -2,20 +2,29 @@ import SwiftUI
 
 struct ChatView: View {
 	@StateObject var viewModel: ChatViewModel					//@StateObject erstellt und verwaltet eine Instanz des ObservedObject
+	@State private var scrollToBottom: Bool = false
 	var chat: Chat
 	
 	var body: some View {
 		VStack {
-			ScrollView {
-				LazyVStack(alignment: .leading, spacing: viewModel.lazyVStackspacing) {
-					ForEach(viewModel.chat.messages) { message in
-						let messageViewModel = MessageViewModel(message: message)
-						MessageView(viewModel: messageViewModel)
+			ScrollViewReader { proxy in
+				ScrollView {
+					LazyVStack(alignment: .leading, spacing: viewModel.lazyVStackspacing) {
+						ForEach(viewModel.chat.messages) { message in
+							let messageViewModel = MessageViewModel(message: message)
+							MessageView(viewModel: messageViewModel)
+								.id(message.id)
+						}
+					}
+					.padding()
+				}
+				.onChange(of: viewModel.chat.messages.count) {
+					withAnimation {
+						proxy.scrollTo(viewModel.chat.messages.last?.id, anchor: .bottom)
 					}
 				}
-				.padding()
-			}
 
+			}
 			Divider()
 
 			HStack {

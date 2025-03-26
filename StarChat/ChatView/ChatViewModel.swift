@@ -8,7 +8,7 @@ class ChatViewModel: ObservableObject {			//ObservableObject: Ermöglicht, dass 
 	@Published var newMessage: String = ""
 	//MARK: - @Published: Markiert eine Variable als beobachtbar. Änderungen lösen automatisch UI-Updates aus, sofern die Klasse ein ObservableObject ist.
 	
-	private let apiKey = "key"
+	private let apiKey = "myKey"
 	var chatHistory: [[String: Any]] = []
 	
 	var geminiURL: String {
@@ -33,7 +33,6 @@ class ChatViewModel: ObservableObject {			//ObservableObject: Ermöglicht, dass 
 		let isFirstMessage = chat.messages.isEmpty
 		
 		if isFirstMessage {
-			
 			let systemPrompt = "Du bist \(chat.name). \(chat.persona)"
 			
 			chatHistory.append([
@@ -41,7 +40,7 @@ class ChatViewModel: ObservableObject {			//ObservableObject: Ermöglicht, dass 
 				"parts": [["text": systemPrompt]]
 			])
 		}
-		//MARK: - Jede Nachricht wird als user oder model (KI) gespeichert. Im parts-array steht dann die dazugehörige Nachricht. systemPrompt sagt wie sich die KI verhalten soll.
+		//MARK: - Jede Nachricht wird als user oder model (KI) gespeichert. Im parts-array steht dann die dazugehörige Nachricht. systemPrompt sagt wie sich die KI verhalten soll. systemPrompt wird nur einmal pro Chat verschickt, damit er sich nicht ständig neu vorstellt.
 		
 		chatHistory.append(contentsOf: chat.messages.map { message in
 			[
@@ -87,12 +86,6 @@ class ChatViewModel: ObservableObject {			//ObservableObject: Ermöglicht, dass 
 				print("Fehler: \(error?.localizedDescription ?? "Unbekannt")")
 				return
 			}
-			
-			// 🟢 Debug: Rohdaten als String ausgeben
-			if let jsonString = String(data: data, encoding: .utf8) {
-				print("📜 Antwort von API: \(jsonString)")
-			}
-			//MARK: - gibt die Antwort von der KI als String aus.
 			
 			do {
 				let decodedResponse = try JSONDecoder().decode(GeminiResponse.self, from: data)
