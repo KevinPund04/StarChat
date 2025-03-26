@@ -2,16 +2,13 @@ import SwiftUI
 
 class ChatViewModel: ObservableObject {			//ObservableObject: Ermöglicht, dass Änderungen im ViewModel die UI aktualisieren können
 	
-	let cornerRadius: CGFloat = 10
-	let textMaxWidth: CGFloat = 250
-	let backgroundColorOpacity: CGFloat = 0.7
 	let lazyVStackspacing: CGFloat = 8
 	
 	@Published var chat: Chat
 	@Published var newMessage: String = ""
 	//MARK: - @Published: Markiert eine Variable als beobachtbar. Änderungen lösen automatisch UI-Updates aus, sofern die Klasse ein ObservableObject ist.
 	
-	private let apiKey = "MyKey"
+	private let apiKey = "AIzaSyAKkPfT8MXfV3e7X0E5qDox1PGKdZqsT5I"
 	var chatHistory: [[String: Any]] = []
 	
 	var geminiURL: String {

@@ -9,25 +9,8 @@ struct ChatView: View {
 			ScrollView {
 				LazyVStack(alignment: .leading, spacing: viewModel.lazyVStackspacing) {
 					ForEach(viewModel.chat.messages) { message in
-						HStack {
-							if message.isUser {
-								Spacer()
-								Text(message.text)
-									.padding()
-									.background(Color.blue.opacity(viewModel.backgroundColorOpacity))
-									.foregroundColor(.white)
-									.cornerRadius(viewModel.cornerRadius)
-									.frame(maxWidth: viewModel.textMaxWidth, alignment: .trailing)
-							} else {
-								Text(message.text)
-									.padding()
-									.background(Color.white.opacity(viewModel.backgroundColorOpacity))
-									.foregroundColor(.black)
-									.cornerRadius(viewModel.cornerRadius)
-									.frame(maxWidth: viewModel.textMaxWidth, alignment: .leading)
-								Spacer()
-							}
-						}
+						let messageViewModel = MessageViewModel(message: message)
+						MessageView(viewModel: messageViewModel)
 					}
 				}
 				.padding()
@@ -39,8 +22,10 @@ struct ChatView: View {
 				TextField("Nachricht eingeben...", text: $viewModel.newMessage)
 					.textFieldStyle(RoundedBorderTextFieldStyle())
 					.padding()
-
 				Button(action: {
+					let trimmedMessage = viewModel.newMessage.trimmingCharacters(in: .whitespacesAndNewlines)
+					if trimmedMessage.isEmpty { return }
+					
 					viewModel.sendMessage(viewModel.newMessage)
 					viewModel.newMessage = ""
 				}) {
