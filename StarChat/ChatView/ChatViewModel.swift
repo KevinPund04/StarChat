@@ -25,11 +25,7 @@ class ChatViewModel: ObservableObject {			//ObservableObject: Ermöglicht, dass 
 	
 	
 	func sendMessage(_ userMessage: String) {
-		
-		
-		
-		//MARK: - chatHistory enthält die gesamte Unterhaltung
-		
+	
 		let isFirstMessage = chat.messages.isEmpty
 		
 		if isFirstMessage {
@@ -105,4 +101,5 @@ class ChatViewModel: ObservableObject {			//ObservableObject: Ermöglicht, dass 
 	func saveChat() {
 		ChatStorage.shared.saveChat(chat)
 	}
+	
 }

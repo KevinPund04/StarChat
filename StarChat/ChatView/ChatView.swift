@@ -2,7 +2,7 @@ import SwiftUI
 
 struct ChatView: View {
 	@StateObject var viewModel: ChatViewModel					//@StateObject erstellt und verwaltet eine Instanz des ObservedObject
-	@State private var scrollToBottom: Bool = false
+	
 	var chat: Chat
 	
 	var body: some View {
@@ -44,6 +44,12 @@ struct ChatView: View {
 			}
 			.padding(.horizontal)
 		}
-		.navigationTitle(viewModel.chat.name)
+		.navigationBarTitleDisplayMode(.inline)
+		.toolbar {
+			ToolbarItem(placement: .principal) {
+				Text(viewModel.chat.name)
+					.font(.headline)
+			}
+		}
 	}
 }
