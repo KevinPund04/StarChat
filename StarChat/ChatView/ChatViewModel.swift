@@ -12,7 +12,7 @@ class ChatViewModel: ObservableObject {			//ObservableObject: Ermöglicht, dass 
 	var chatHistory: [[String: Any]] = []
 	
 	var geminiURL: String {
-		"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=\(apiKey)"		//Wert wird nicht gespeichert, sondern dynamisch 
+		"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=\(apiKey)"		//Wert wird nicht gespeichert, sondern dynamisch
 	}
 	
 	var emptyMessage: String {

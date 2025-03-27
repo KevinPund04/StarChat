@@ -6,6 +6,7 @@ struct ChatView: View {
 	var chat: Chat
 	
 	var body: some View {
+		
 		VStack {
 			ScrollViewReader { proxy in
 				ScrollView {
@@ -25,6 +26,7 @@ struct ChatView: View {
 				}
 
 			}
+			
 			Divider()
 
 			HStack {
@@ -47,9 +49,17 @@ struct ChatView: View {
 		.navigationBarTitleDisplayMode(.inline)
 		.toolbar {
 			ToolbarItem(placement: .principal) {
-				Text(viewModel.chat.name)
-					.font(.headline)
-			}
+				HStack{
+					Image(chat.imageName)
+						.resizable()
+						.scaledToFit()
+						.frame(width: 40, height: 40)
+						.clipShape(Circle())
+						.overlay(Circle().stroke(Color.gray, lineWidth: 1))
+					Text(viewModel.chat.name)
+							.font(.headline)
+					}
+				}
 		}
 	}
 }
