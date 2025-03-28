@@ -2,7 +2,7 @@ import SwiftUI
 
 struct ChatView: View {
 	@StateObject var viewModel: ChatViewModel					//@StateObject erstellt und verwaltet eine Instanz des ObservedObject
-	
+	@Environment(\.isTabBarHidden) private var isTabBarHidden
 	var chat: Chat
 	
 	var body: some View {
@@ -21,14 +21,14 @@ struct ChatView: View {
 				}
 				.onChange(of: viewModel.chat.messages.count) {
 					withAnimation {
-						proxy.scrollTo(viewModel.chat.messages.last?.id, anchor: .bottom)
+						proxy.scrollTo(viewModel.chat.messages.last?.id, anchor: .top)
 					}
 				}
-
+				
 			}
 			
 			Divider()
-
+			
 			HStack {
 				TextField("Nachricht eingeben...", text: $viewModel.newMessage)
 					.textFieldStyle(RoundedBorderTextFieldStyle())
@@ -47,7 +47,8 @@ struct ChatView: View {
 			.padding(.horizontal)
 		}
 		.navigationBarTitleDisplayMode(.inline)
-		.toolbar {
+		.toolbar(.hidden, for: .tabBar)
+		.toolbar() {
 			ToolbarItem(placement: .principal) {
 				HStack{
 					Image(chat.imageName)
@@ -57,9 +58,15 @@ struct ChatView: View {
 						.clipShape(Circle())
 						.overlay(Circle().stroke(Color.gray, lineWidth: 1))
 					Text(viewModel.chat.name)
-							.font(.headline)
-					}
+						.font(.headline)
 				}
+			}
+		}
+		.onAppear {
+			isTabBarHidden.wrappedValue = true
+		}
+		.onDisappear {
+			isTabBarHidden.wrappedValue = false
 		}
 	}
 }

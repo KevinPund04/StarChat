@@ -2,9 +2,10 @@ import SwiftUI
 
 struct ChatListView: View {
 	@StateObject private var viewModel = ChatListViewModel()
+	@Environment(\.isTabBarHidden) private var isTabBarHidden
 	
 	var body: some View {
-		NavigationView {
+		NavigationStack {
 			List(viewModel.filteredChat) { chat in
 				let chatViewModel = ChatViewModel(chat: chat)
 				NavigationLink(destination: ChatView(viewModel: chatViewModel, chat: chat)) {
@@ -16,7 +17,7 @@ struct ChatListView: View {
 							.clipShape(Circle())
 							.overlay(Circle().stroke(Color.gray, lineWidth: 1))
 						
-							Text(chat.name)
+						Text(chat.name)
 					}
 				}
 			}

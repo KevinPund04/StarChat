@@ -11,7 +11,8 @@ import SwiftUI
 struct StarChatApp: App {
     var body: some Scene {
         WindowGroup {
-			ChatListView()
+//			ChatListView()
+			MainTabView()
         }
     }
 }
