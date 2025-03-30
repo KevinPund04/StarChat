@@ -9,6 +9,7 @@ class ChatStorage {
 	
 	private init() {
 		createChatsDirectory()
+		copyChatsToDocumentsIfNeeded()
 	}
 	
 	private func createChatsDirectory() {
@@ -16,16 +17,86 @@ class ChatStorage {
 			do {
 				try fileManager.createDirectory(at: chatsDirectory, withIntermediateDirectories: true, attributes: nil)
 			} catch {
-				print("❌ Fehler beim Erstellen des Chats-Ordners: \(error.localizedDescription)")
+				print("Fehler beim Erstellen des Chats-Ordners: \(error.localizedDescription)")
 			}
 		}
 	}
 	
+	private func copyChatsToDocumentsIfNeeded() {
+		do {
+			// Hole die Dateien im Dokumentenverzeichnis
+			let existingFiles = try fileManager.contentsOfDirectory(atPath: chatsDirectory.path)
+			
+			// Prüfen, ob schon Dateien vorhanden sind
+			if existingFiles.contains(where: { $0.hasSuffix(".json") }) {
+				print("Chats sind bereits im Dokumentenverzeichnis vorhanden.")
+				return
+			}
+			
+			// Hole den Resources-Pfad
+			guard let resourcesPath = Bundle.main.resourcePath else {
+				print("Konnte den Resources-Pfad nicht finden.")
+				return
+			}
+			
+			let resourcesFile = try fileManager.contentsOfDirectory(atPath: resourcesPath)
+			
+			for file in resourcesFile where file.hasSuffix(".json") {
+				let sourceURL = URL(fileURLWithPath: resourcesPath).appendingPathComponent(file)
+				let destinationURL = chatsDirectory.appendingPathComponent(file)
+				
+				// Überprüfen, ob die Datei bereits existiert
+				if fileManager.fileExists(atPath: destinationURL.path) {
+					print("\(file) existiert bereits im Dokumentenverzeichnis.")
+					continue
+				}
+				
+				// Datei kopieren
+				do {
+					try fileManager.copyItem(at: sourceURL, to: destinationURL)
+					print("Erfolgreich kopiert: \(file)")
+				} catch {
+					print("Fehler beim Kopieren von \(file): \(error.localizedDescription)")
+				}
+			}
+		} catch {
+			print("Fehler beim Überprüfen der Dateien: \(error.localizedDescription)")
+		}
+	}
+
+	
+	private func copyChatsFromResourcesIfNeeded() {
+		
+		guard let resourcesPath = Bundle.main.resourcePath else { return }
+		do {
+			let files = try fileManager.contentsOfDirectory(atPath: resourcesPath)
+			for file in files where file.hasSuffix(".json") {
+				let destinationURL = chatsDirectory.appendingPathComponent(file)
+				if !fileManager.fileExists(atPath: destinationURL.path) {
+					let sourcesURL = URL(fileURLWithPath: resourcesPath).appendingPathComponent(file)
+					do {
+						try fileManager.copyItem(at: sourcesURL, to: destinationURL)
+					} catch {
+						print("Fehler beim Kopieren von \(file): \(error.localizedDescription)")
+					}
+				}
+			}
+		} catch {
+			print("Fehler beim Durchsuchen des Resources-Ordners: \(error.localizedDescription)")
+		}
+	}
+	
 	func saveChat(_ chat: Chat) {
-		let fileURL = chatsDirectory.appendingPathComponent("\(chat.name).json")
+		
+		let safeFileName = chat.name.replacingOccurrences(of: " ", with: "_")
+		
+		let fileURL = chatsDirectory.appendingPathComponent("\(safeFileName).json")
+//		print("Speichert Chat unter \(fileURL.path)")
+		
 		do {
 			let data = try JSONEncoder().encode(chat)
 			try data.write(to: fileURL)
+//			print("Chat gespeichert für \(chat.name)")
 		} catch {
 			print("Fehler beim Speichern des Chats: \(error.localizedDescription)")
 		}
@@ -48,35 +119,45 @@ class ChatStorage {
 	
 	func loadAllChats() -> [Chat] {
 		var chats: [Chat] = []
+		var loadedChatNames = Set<String>()
+
+		let allFiles: [URL]
 		
-		guard let resourcePath = Bundle.main.resourcePath else {
-			print("Konnte den Ressourcenpfad nicht finden.")
+		do {
+			let bundleFiles = try fileManager.contentsOfDirectory(atPath: Bundle.main.resourcePath!)
+				.filter { $0.hasSuffix(".json") }
+				.compactMap { Bundle.main.url(forResource: $0.replacingOccurrences(of: ".json", with: ""), withExtension: "json") }
+			
+			let documentFiles = try fileManager.contentsOfDirectory(at: chatsDirectory, includingPropertiesForKeys: nil)
+			
+			// Nur die Dateien aus dem Dokumentenordner nehmen, falls sie schon existieren
+			let documentFileNames = Set(documentFiles.map { $0.lastPathComponent })
+			
+			// Falls eine Datei im Dokumenten-Ordner existiert, die Bundle-Version ignorieren
+			let filteredBundleFiles = bundleFiles.filter { !documentFileNames.contains($0.lastPathComponent) }
+			
+			allFiles = filteredBundleFiles + documentFiles
+		} catch {
+			print("Fehler beim Durchsuchen der Verzeichnisse: \(error.localizedDescription)")
 			return []
 		}
 		
-		do {
-			let files = try FileManager.default.contentsOfDirectory(atPath: resourcePath)
-			
-			for file in files where file.hasSuffix(".json") {
-				let fileName = file.replacingOccurrences(of: ".json", with: "")
+		for fileURL in allFiles {
+			do {
+				let data = try Data(contentsOf: fileURL)
+				let chat = try JSONDecoder().decode(Chat.self, from: data)
+				print("\(chat.name) - \(chat.isFavorite)")
 				
-				if let fileURL = Bundle.main.url(forResource: fileName, withExtension: "json") {
-					do {
-						let data = try Data(contentsOf: fileURL)
-						let chat = try JSONDecoder().decode(Chat.self, from: data)
-						chats.append(chat)
-					}
-					catch {
-						print("Fehler beim Laden von \(file): \(error.localizedDescription)")
-					}
-				} else {
-					print("Datei \(file) konnte nicht im Bundle gefunden werden.")
+				if !loadedChatNames.contains(chat.name) {
+					chats.append(chat)
+					loadedChatNames.insert(chat.name)
 				}
+			} catch {
+				print("Fehler beim Laden von \(fileURL.lastPathComponent): \(error.localizedDescription)")
 			}
-		} catch {
-			print("Fehler beim Durchsuchen des Resource-Ordners: \(error.localizedDescription)")
 		}
 		
 		return chats
 	}
+
 }

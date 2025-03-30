@@ -24,6 +24,10 @@ class ChatViewModel: ObservableObject {			//ObservableObject: Ermöglicht, dass 
 		self.chat = chat
 	}
 	
+	func toggleFavorite() {
+		chat.isFavorite.toggle()
+		ChatStorage.shared.saveChat(chat)
+	}
 	
 	func sendMessage(_ userMessage: String) {
 	
@@ -53,7 +57,6 @@ class ChatViewModel: ObservableObject {			//ObservableObject: Ermöglicht, dass 
 			"parts": [["text": userMessage]]
 		])
 		//MARK: - Hier wird die Nachricht von den User am ende hinzugefügt. So weis sie KI auf welche Nachricht Sie antworten muss.
-		
 		
 		let requestBody: [String: Any] = ["contents": chatHistory]
 	

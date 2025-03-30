@@ -57,8 +57,20 @@ struct ChatView: View {
 						.frame(width: 40, height: 40)
 						.clipShape(Circle())
 						.overlay(Circle().stroke(Color.gray, lineWidth: 1))
+					
 					Text(viewModel.chat.name)
 						.font(.headline)
+					
+					Spacer()
+				}
+			}
+			
+			ToolbarItem(placement: .navigationBarTrailing) {
+				Button(action: {
+					viewModel.toggleFavorite()
+				}) {
+					Image(systemName: viewModel.chat.isFavorite ? "star.fill" : "star")
+						.foregroundColor(.yellow)
 				}
 			}
 		}

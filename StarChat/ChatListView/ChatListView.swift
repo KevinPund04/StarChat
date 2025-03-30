@@ -23,6 +23,9 @@ struct ChatListView: View {
 			}
 			.searchable(text: $viewModel.searchChat, prompt: "Chat suchen")
 			.navigationTitle("Chats")
+			.onAppear {
+				viewModel.loadChats()
+			}
 		}
 	}
 }
