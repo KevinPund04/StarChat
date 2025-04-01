@@ -13,5 +13,7 @@ class FavoriteChatsViewModel: ObservableObject {
 //		print("Favorisierte Chats: \(favoriteChats)")
 	}
 	
-	
+	func clearChat(chatName: String) {
+		ChatStorage.shared.clearChatHistory(for: chatName)
+	}
 }

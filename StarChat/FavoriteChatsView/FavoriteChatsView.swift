@@ -20,6 +20,14 @@ struct FavoriteChatsView: View {
 						Text(chat.name)
 					}
 				}
+				.contextMenu {
+					Button(role: .destructive) {
+						viewModel.clearChat(chatName: chat.name)
+						viewModel.loadFavoriteChats()
+					} label: {
+						Label("Chatverlauf löschen", systemImage: "trash")
+					}
+				}
 			}
 			.navigationTitle("Favoriten")
 			.onAppear {

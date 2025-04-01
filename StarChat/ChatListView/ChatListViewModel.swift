@@ -22,4 +22,8 @@ class ChatListViewModel: ObservableObject {
 	func loadChats() {
 		self.chats = ChatStorage.shared.loadAllChats()
 	}
+	
+	func clearChat(chatName: String) {
+		ChatStorage.shared.clearChatHistory(for: chatName)
+	}
 }

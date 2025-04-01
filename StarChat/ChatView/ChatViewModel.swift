@@ -3,7 +3,6 @@ import SwiftUI
 class ChatViewModel: ObservableObject {			//ObservableObject: Ermöglicht, dass Änderungen im ViewModel die UI aktualisieren können
 	
 	let lazyVStackspacing: CGFloat = 8
-	let dontListYourAnswer: String = "Ich Antworte immer in vollen Sätzen und Liste nichts auf."
 	
 	@Published var chat: Chat
 	@Published var newMessage: String = ""
@@ -22,6 +21,7 @@ class ChatViewModel: ObservableObject {			//ObservableObject: Ermöglicht, dass 
 	
 	init(chat: Chat) {
 		self.chat = chat
+		setupChatHistory()
 	}
 	
 	func toggleFavorite() {
@@ -30,18 +30,6 @@ class ChatViewModel: ObservableObject {			//ObservableObject: Ermöglicht, dass 
 	}
 	
 	func sendMessage(_ userMessage: String) {
-	
-		let isFirstMessage = chat.messages.isEmpty
-		
-		if isFirstMessage {
-			let systemPrompt = "Du bist \(chat.name). \(chat.persona)"
-			
-			chatHistory.append([
-				"role": "model",
-				"parts": [["text": systemPrompt + dontListYourAnswer]]
-			])
-		}
-		//MARK: - Jede Nachricht wird als user oder model (KI) gespeichert. Im parts-array steht dann die dazugehörige Nachricht. systemPrompt sagt wie sich die KI verhalten soll. systemPrompt wird nur einmal pro Chat verschickt, damit er sich nicht ständig neu vorstellt.
 		
 		chatHistory.append(contentsOf: chat.messages.map { message in
 			[
@@ -49,8 +37,6 @@ class ChatViewModel: ObservableObject {			//ObservableObject: Ermöglicht, dass 
 				"parts": [["text": message.text]]
 			]
 		})
-		//MARK: - Fügt die Nachricht in das chatHistory-array hinzu.
-		
 		
 		chatHistory.append([
 			"role": "user",
@@ -100,6 +86,19 @@ class ChatViewModel: ObservableObject {			//ObservableObject: Ermöglicht, dass 
 				print("Fehler beim Decodieren der Antwort: \(error)")
 			}
 		}.resume()
+	}
+	
+	func setupChatHistory() {
+		let dontListYourAnswer: String = "Ich Antworte immer in vollen Sätzen und Liste nichts auf."
+		
+		chatHistory.removeAll()
+
+		let systemPrompt = "Du bist \(chat.name). \(chat.persona) Du bleibst immer in deiner Rolle und fällst niemals aus ihr. \(dontListYourAnswer)"
+
+		chatHistory.append([
+			"role": "model",
+			"parts": [["text": systemPrompt]]
+		])
 	}
 	
 	func saveChat() {

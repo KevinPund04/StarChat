@@ -103,8 +103,15 @@ class ChatStorage {
 	}
 	
 	func loadChat(name: String) -> Chat? {
-		let fileURL = chatsDirectory.appendingPathComponent("\(name).json")
+		
+		let safeFileName = name.replacingOccurrences(of: " ", with: "_")
+		
+		let fileURL = chatsDirectory.appendingPathComponent("\(safeFileName).json")
+		
+		print("📂 Lade Chat von: \(fileURL.path)") // Debug-Info
+		
 		guard fileManager.fileExists(atPath: fileURL.path) else {
+			print("❌ Datei nicht gefunden: \(fileURL.path)")
 			return nil
 		}
 		
@@ -146,7 +153,7 @@ class ChatStorage {
 			do {
 				let data = try Data(contentsOf: fileURL)
 				let chat = try JSONDecoder().decode(Chat.self, from: data)
-				print("\(chat.name) - \(chat.isFavorite)")
+//				print("\(chat.name) - \(chat.isFavorite)")
 				
 				if !loadedChatNames.contains(chat.name) {
 					chats.append(chat)
@@ -158,6 +165,16 @@ class ChatStorage {
 		}
 		
 		return chats
+	}
+	
+	func clearChatHistory(for chatName: String) {
+		guard var chat = loadChat(name: chatName) else {
+			print("Chat nicht gefunden: \(chatName)")
+			return
+		}
+		
+		chat.messages = []
+		saveChat(chat)
 	}
 
 }
