@@ -24,33 +24,28 @@ class ChatStorage {
 	
 	private func copyChatsToDocumentsIfNeeded() {
 		do {
-			// Hole die Dateien im Dokumentenverzeichnis
+			// Hole die vorhandenen Dateien im Dokumentenverzeichnis
 			let existingFiles = try fileManager.contentsOfDirectory(atPath: chatsDirectory.path)
-			
-			// Prüfen, ob schon Dateien vorhanden sind
-			if existingFiles.contains(where: { $0.hasSuffix(".json") }) {
-				print("Chats sind bereits im Dokumentenverzeichnis vorhanden.")
-				return
-			}
-			
+
 			// Hole den Resources-Pfad
 			guard let resourcesPath = Bundle.main.resourcePath else {
 				print("Konnte den Resources-Pfad nicht finden.")
 				return
 			}
-			
-			let resourcesFile = try fileManager.contentsOfDirectory(atPath: resourcesPath)
-			
-			for file in resourcesFile where file.hasSuffix(".json") {
+
+			// Hole alle JSON-Dateien aus den Ressourcen
+			let resourcesFiles = try fileManager.contentsOfDirectory(atPath: resourcesPath).filter { $0.hasSuffix(".json") }
+
+			for file in resourcesFiles {
 				let sourceURL = URL(fileURLWithPath: resourcesPath).appendingPathComponent(file)
 				let destinationURL = chatsDirectory.appendingPathComponent(file)
-				
+
 				// Überprüfen, ob die Datei bereits existiert
-				if fileManager.fileExists(atPath: destinationURL.path) {
+				if existingFiles.contains(file) {
 					print("\(file) existiert bereits im Dokumentenverzeichnis.")
 					continue
 				}
-				
+
 				// Datei kopieren
 				do {
 					try fileManager.copyItem(at: sourceURL, to: destinationURL)
@@ -64,7 +59,7 @@ class ChatStorage {
 		}
 	}
 
-	
+
 	private func copyChatsFromResourcesIfNeeded() {
 		
 		guard let resourcesPath = Bundle.main.resourcePath else { return }

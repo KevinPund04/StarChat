@@ -3,8 +3,9 @@ import SwiftUI
 struct ChatView: View {
 	@StateObject var viewModel: ChatViewModel
 	@Environment(\.isTabBarHidden) private var isTabBarHidden
+	@State private var isImageExpanded = false
 	var chat: Chat
-
+	
 	var body: some View {
 		VStack {
 			messageListView()
@@ -15,8 +16,11 @@ struct ChatView: View {
 		.toolbar { toolbarContent }
 		.onAppear { isTabBarHidden.wrappedValue = true }
 		.onDisappear { isTabBarHidden.wrappedValue = false }
+		.sheet(isPresented: $isImageExpanded) {
+			FullScreenImageView(imageName: chat.imageName)
+		}
 	}
-
+	
 	@ViewBuilder
 	private func messageListView() -> some View {
 		ScrollViewReader { proxy in
@@ -44,7 +48,7 @@ struct ChatView: View {
 			}
 		}
 	}
-
+	
 	@ViewBuilder
 	private func messageInputView() -> some View {
 		Divider()
@@ -60,23 +64,25 @@ struct ChatView: View {
 		}
 		.padding(.horizontal)
 	}
-
+	
 	private func sendMessage() {
 		if viewModel.newMessage.isEmpty { return }
 		viewModel.sendMessage(viewModel.newMessage)
 		viewModel.newMessage = ""
 	}
-
+	
 	@ToolbarContentBuilder
 	private var toolbarContent: some ToolbarContent {
 		ToolbarItem(placement: .principal) {
 			HStack {
-				Image(chat.imageName)
-					.resizable()
-					.scaledToFit()
-					.frame(width: 40, height: 40)
-					.clipShape(Circle())
-					.overlay(Circle().stroke(Color.gray, lineWidth: 1))
+				Button(action: { isImageExpanded = true }) {
+					Image(chat.imageName)
+						.resizable()
+						.scaledToFit()
+						.frame(width: 40, height: 40)
+						.clipShape(Circle())
+						.overlay(Circle().stroke(Color.gray, lineWidth: 1))
+				}
 				Text(viewModel.chat.name)
 					.font(.headline)
 				Spacer()
@@ -86,6 +92,21 @@ struct ChatView: View {
 			Button(action: { viewModel.toggleFavorite() }) {
 				Image(systemName: viewModel.chat.isFavorite ? "star.fill" : "star")
 					.foregroundColor(.yellow)
+			}
+		}
+	}
+	struct FullScreenImageView: View {
+		let imageName: String
+		@Environment(\.dismiss) var dismiss  // Ermöglicht das Schließen des Sheets
+		
+		var body: some View {
+			ZStack {
+				Color.black.ignoresSafeArea()
+				Image(imageName)
+					.resizable()
+					.scaledToFit()
+					.padding()
+					.onTapGesture { dismiss() }  // Tippen, um das Bild zu schließen
 			}
 		}
 	}
