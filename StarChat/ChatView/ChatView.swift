@@ -4,6 +4,7 @@ struct ChatView: View {
 	@StateObject var viewModel: ChatViewModel
 	@Environment(\.isTabBarHidden) private var isTabBarHidden
 	@State private var isImageExpanded = false
+	@State private var hasScrolledToBottom = false
 	var chat: Chat
 	
 	var body: some View {
@@ -40,6 +41,14 @@ struct ChatView: View {
 					}
 				}
 				.padding()
+				.onAppear {
+					if !hasScrolledToBottom {
+						DispatchQueue.main.async {
+								proxy.scrollTo(viewModel.chat.messages.last?.id, anchor: .bottom)
+								hasScrolledToBottom = true
+						}
+					}
+				}
 			}
 			.onChange(of: viewModel.chat.messages.count) {
 				withAnimation {
